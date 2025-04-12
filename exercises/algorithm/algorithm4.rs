@@ -2,8 +2,6 @@
 	binary_search tree
 	This problem requires you to implement a basic interface for a binary tree
 */
-
-//I AM NOT DONE
 use std::cmp::Ordering;
 use std::fmt::Debug;
 
@@ -48,15 +46,18 @@ where
         BinarySearchTree { root: None }
     }
 
-    // Insert a value into the BST
     fn insert(&mut self, value: T) {
-        //TODO
+        match self.root {
+            Some(ref mut root_node) => root_node.insert(value),
+            None => self.root = Some(Box::new(TreeNode::new(value))),
+        }
     }
 
-    // Search for a value in the BST
     fn search(&self, value: T) -> bool {
-        //TODO
-        true
+        match self.root {
+            Some(ref root_node) => root_node.search(value),
+            None => false,
+        }
     }
 }
 
@@ -64,9 +65,44 @@ impl<T> TreeNode<T>
 where
     T: Ord,
 {
-    // Insert a node into the tree
     fn insert(&mut self, value: T) {
-        //TODO
+        match value.cmp(&self.value) {
+            Ordering::Less => {
+                if let Some(ref mut left_node) = self.left {
+                    left_node.insert(value);
+                } else {
+                    self.left = Some(Box::new(TreeNode::new(value)));
+                }
+            }
+            Ordering::Greater => {
+                if let Some(ref mut right_node) = self.right {
+                    right_node.insert(value);
+                } else {
+                    self.right = Some(Box::new(TreeNode::new(value)));
+                }
+            }
+            Ordering::Equal => {} // Ignore duplicate values
+        }
+    }
+
+    fn search(&self, value: T) -> bool {
+        match value.cmp(&self.value) {
+            Ordering::Equal => true,
+            Ordering::Less => {
+                if let Some(ref left_node) = self.left {
+                    left_node.search(value)
+                } else {
+                    false
+                }
+            }
+            Ordering::Greater => {
+                if let Some(ref right_node) = self.right {
+                    right_node.search(value)
+                } else {
+                    false
+                }
+            }
+        }
     }
 }
 

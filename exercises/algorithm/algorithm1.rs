@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -70,16 +69,43 @@ impl<T> LinkedList<T> {
         }
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
-	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
-        }
-	}
-}
+    where
+    T: PartialOrd + Clone,
+{
+    let mut merged_list = LinkedList::new();
+    let mut ptr_a = list_a.start;
+    let mut ptr_b = list_b.start;
 
+    // Traverse both lists until one is exhausted
+    while let (Some(node_a), Some(node_b)) = (ptr_a, ptr_b) {
+        let val_a = unsafe { &(*node_a.as_ptr()).val };
+        let val_b = unsafe { &(*node_b.as_ptr()).val };
+
+        if val_a < val_b {
+            merged_list.add(val_a.clone());
+            ptr_a = unsafe { (*node_a.as_ptr()).next };
+        } else {
+            merged_list.add(val_b.clone());
+            ptr_b = unsafe { (*node_b.as_ptr()).next };
+        }
+    }
+
+    // Append remaining nodes from list_a
+    while let Some(node_a) = ptr_a {
+        merged_list.add(unsafe { &(*node_a.as_ptr()).val }.clone());
+        ptr_a = unsafe { (*node_a.as_ptr()).next };
+    }
+
+    // Append remaining nodes from list_b
+    while let Some(node_b) = ptr_b {
+        merged_list.add(unsafe { &(*node_b.as_ptr()).val }.clone());
+        ptr_b = unsafe { (*node_b.as_ptr()).next };
+    }
+
+    merged_list
+}
+}
+    
 impl<T> Display for LinkedList<T>
 where
     T: Display,
